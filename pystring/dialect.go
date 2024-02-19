@@ -5,25 +5,37 @@ package pystring
 // in our out into.
 var DefaultDialect = NewDialect(3.11)
 var DialectPython3_11 = NewDialect(3.11)
+var DialectPython3_10 = NewDialect(3.10)
 var DialectPython3_0 = NewDialect(3.0)
 
 type Dialect struct {
-	zeroPaddingAlignment  rune
-	tryTypeJugglingString bool
+	zeroPaddingAlignment                rune
+	tryTypeJugglingString               bool
+	enableCoercesNegativeZeroToPositive bool
 }
 
 type DialectOption func(*Dialect)
 
 func NewDialect(version float64, options ...DialectOption) Dialect {
 	res := Dialect{
-		zeroPaddingAlignment:  '=',
-		tryTypeJugglingString: false,
+		zeroPaddingAlignment:                '=',
+		tryTypeJugglingString:               false,
+		enableCoercesNegativeZeroToPositive: false,
 	}
 
+	// Sources for per version adjustments: https://docs.python.org/3/library/string.html#string.Formatter
+
 	// Changed in version 3.10: Preceding the width field by '0' no longer affects the default alignment for strings.
-	// https://docs.python.org/3/library/string.html#string.Formatter
 	if version >= 3.10 {
 		res.zeroPaddingAlignment = 0
+	}
+
+	// The 'z' option coerces negative zero floating-point values to positive zero after rounding to the format precision.
+	// This option is only valid for floating-point presentation types.
+	//
+	// Changed in version 3.11: Added the 'z' option (see also PEP 682).
+	if version >= 3.11 {
+		res.enableCoercesNegativeZeroToPositive = true
 	}
 
 	for _, option := range options {

@@ -2,6 +2,7 @@ package pystring
 
 import (
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 	"unicode"
@@ -12,15 +13,16 @@ import (
 
 // FormatSpec represents the format specification for formatting values
 type FormatSpec struct {
-	dialect     Dialect
-	Fill        rune // Fill character
-	Align       rune // Alignment character ('<' for left, '>' for right, '^' for center, '=' for numeric only)
-	Sign        rune // Sign character ('+' for both, '-' for negative only, ' ' for leading space)
-	Alternate   bool // Alternate form ('#' for alternative form)
-	ZeroPadding bool // Zero padding ('0' for zero padding)
-	MinWidth    uint // Minimum width
-	Precision   uint // Precision
-	Type        rune // Type character ('b', 'c', 'd', 'o', 'x', 'X', 'e', 'E', 'f', 'F', 'g', 'G', '%')
+	dialect             Dialect
+	Fill                rune // Fill character
+	Align               rune // Alignment character ('<' for left, '>' for right, '^' for center, '=' for numeric only)
+	Sign                rune // Sign character ('+' for both, '-' for negative only, ' ' for leading space)
+	CoercesNegativeZero bool // coerces negative zero floating-point values to positive zero after rounding to the format precision.
+	Alternate           bool // Alternate form ('#' for alternative form)
+	ZeroPadding         bool // Zero padding ('0' for zero padding)
+	MinWidth            uint // Minimum width
+	Precision           uint // Precision
+	Type                rune // Type character ('b', 'c', 'd', 'o', 'x', 'X', 'e', 'E', 'f', 'F', 'g', 'G', '%')
 }
 
 func NewFormatterSpecFromStr(format string) (FormatSpec, error) {
@@ -53,7 +55,7 @@ func (d Dialect) NewFormatterSpecFromStr(format string) (FormatSpec, error) {
 
 		switch char {
 		case '<', '>', '^', '=':
-			if spec.Sign != 0 || spec.Alternate || spec.MinWidth > 0 || spec.Precision > 0 || spec.Type != 0 {
+			if spec.Sign != 0 || spec.CoercesNegativeZero || spec.Alternate || spec.MinWidth > 0 || spec.Precision > 0 || spec.Type != 0 {
 				return spec, fmt.Errorf("%w: Invalid format specifier '%s' - Alignment may only be first or second character", ErrValue, format)
 			}
 			spec.Align = char
@@ -62,10 +64,19 @@ func (d Dialect) NewFormatterSpecFromStr(format string) (FormatSpec, error) {
 			}
 
 		case '+', '-', ' ':
-			if spec.Sign != 0 || spec.Alternate || spec.MinWidth > 0 || spec.Precision > 0 || spec.Type != 0 {
+			if spec.Sign != 0 || spec.CoercesNegativeZero || spec.Alternate || spec.MinWidth > 0 || spec.Precision > 0 || spec.Type != 0 {
 				return spec, fmt.Errorf("%w: Invalid format specifier '%s' - unexpected1 '%s' ", ErrValue, format, string(char))
 			}
 			spec.Sign = char
+
+		case 'z':
+			if !spec.dialect.enableCoercesNegativeZeroToPositive {
+				return spec, fmt.Errorf("%w: Invalid format specifier '%s' - unexpected2 '%s' ", ErrValue, format, string(char))
+			}
+			if spec.CoercesNegativeZero || spec.Alternate || spec.MinWidth > 0 || spec.Precision > 0 || spec.Type != 0 {
+				return spec, fmt.Errorf("%w: Invalid format specifier '%s' - unexpected2 '%s' ", ErrValue, format, string(char))
+			}
+			spec.CoercesNegativeZero = true
 
 		case '#':
 			if spec.Alternate || spec.MinWidth > 0 || spec.Precision > 0 || spec.Type != 0 {
@@ -520,7 +531,13 @@ func (f FormatSpec) formatInt(value int64) (string, error) {
 	}
 }
 
+var negativeZero = math.Copysign(0, -1)
+
 func (f FormatSpec) FormatFloat(value float64) (string, error) {
+	if f.CoercesNegativeZero && value == negativeZero {
+		value = 0.0
+	}
+
 	valueStr, err := f.formatFloat(value)
 	if err != nil {
 		return "", err

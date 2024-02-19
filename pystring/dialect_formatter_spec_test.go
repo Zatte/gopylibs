@@ -2,6 +2,7 @@ package pystring
 
 import (
 	"fmt"
+	"math"
 	"testing"
 	"unicode"
 )
@@ -116,15 +117,24 @@ func TestValidExpressionsCanBeSerializedAndDeserialized(t *testing.T) {
 	}
 }
 
+func TestCoarceNegativeZeroWithZ(t *testing.T) {
+	// Works after 3.11
+	mustEvalToMatch(t, DialectPython3_11, "z.2f", math.Copysign(0.0, -1), "0.00")
+
+	// not supported before 3.11
+	mustEvalToError(t, DialectPython3_10, "z.2f", 0) // z not supported
+	mustEvalToMatch(t, DialectPython3_10, ".2f", math.Copysign(0.0, -1), "-0.00")
+}
+
 func TestPastFailures(t *testing.T) {
 	// Special cases we don't want to forget about.
-	mustEvalToError(t, " 0", "foobar")
-	mustEvalToMatch(t, "010", "foobar", "foobar0000")
-	mustEvalToMatch(t, "#010d", 16789, "0000016789")
-	mustEvalToMatch(t, ",=-10.5G", 77.11121111111112, ",,,,77.111")
-	mustEvalToMatch(t, "A=#x", -53, "-0x35")
-	mustEvalToMatch(t, "`=87", 10, "`````````````````````````````````````````````````````````````````````````````````````10")
-	mustEvalToError(t, "}<1", "no_used")
+	mustEvalToError(t, DefaultDialect, " 0", "foobar")
+	mustEvalToMatch(t, DefaultDialect, "010", "foobar", "foobar0000")
+	mustEvalToMatch(t, DefaultDialect, "#010d", 16789, "0000016789")
+	mustEvalToMatch(t, DefaultDialect, ",=-10.5G", 77.11121111111112, ",,,,77.111")
+	mustEvalToMatch(t, DefaultDialect, "A=#x", -53, "-0x35")
+	mustEvalToMatch(t, DefaultDialect, "`=87", 10, "`````````````````````````````````````````````````````````````````````````````````````10")
+	mustEvalToError(t, DefaultDialect, "}<1", "no_used")
 }
 
 func FuzzFormatSpec(t *testing.F) {
@@ -375,16 +385,16 @@ func getValidExpressions(d Dialect) []FormatSpec {
 	return res
 }
 
-func mustFormatSpec(t *testing.T, template string) FormatSpec {
-	spec, err := NewFormatterSpecFromStr(template)
+func mustFormatSpec(t *testing.T, d Dialect, template string) FormatSpec {
+	spec, err := d.NewFormatterSpecFromStr(template)
 	if err != nil {
 		t.Fatalf("Failed to parse format spec: %s => %v", template, err)
 	}
 	return spec
 }
 
-func mustEvalToMatch(t *testing.T, template string, val any, expected string) {
-	spec := mustFormatSpec(t, template)
+func mustEvalToMatch(t *testing.T, d Dialect, template string, val any, expected string) {
+	spec := mustFormatSpec(t, d, template)
 	s, err := spec.Format(val)
 	if err != nil {
 		t.Fatalf("Failed to format spec: %s", err)
@@ -394,8 +404,8 @@ func mustEvalToMatch(t *testing.T, template string, val any, expected string) {
 	}
 }
 
-func mustEvalToError(t *testing.T, template string, val any) {
-	spec, err := NewFormatterSpecFromStr(template)
+func mustEvalToError(t *testing.T, d Dialect, template string, val any) {
+	spec, err := d.NewFormatterSpecFromStr(template)
 	if err == nil {
 		_, err2 := spec.Format(val)
 		if err2 == nil {
