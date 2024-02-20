@@ -24,7 +24,7 @@ Format() - Support locale aware formatting
 
 Str Functions
 - [x] [capitalize](https://docs.python.org/3/library/stdtypes.html#str.capitalize)
-- [] [casefold](https://docs.python.org/3/library/stdtypes.html#str.casefold)
+- [x] [casefold](https://docs.python.org/3/library/stdtypes.html#str.casefold)
 - [] [center](https://docs.python.org/3/library/stdtypes.html#str.center)
 - [] [count](https://docs.python.org/3/library/stdtypes.html#str.count)
 - [] [encode](https://docs.python.org/3/library/stdtypes.html#str.encode)
