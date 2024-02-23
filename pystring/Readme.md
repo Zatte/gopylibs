@@ -49,7 +49,7 @@ Str Functions
 - [x] [join](https://docs.python.org/3/library/stdtypes.html#str.join) - Implemented as JoinString() & JoinStringer()
 - [x] [ljust](https://docs.python.org/3/library/stdtypes.html#str.ljust)
 - [x] [lower](https://docs.python.org/3/library/stdtypes.html#str.lower)
-- [] [lstrip](https://docs.python.org/3/library/stdtypes.html#str.lstrip)
+- [x] [lstrip](https://docs.python.org/3/library/stdtypes.html#str.lstrip)
 - [] [maketrans](https://docs.python.org/3/library/stdtypes.html#str.maketrans)
 - [] [partition](https://docs.python.org/3/library/stdtypes.html#str.partition)
 - [] [removeprefix](https://docs.python.org/3/library/stdtypes.html#str.removeprefix)
