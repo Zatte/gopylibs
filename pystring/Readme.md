@@ -68,7 +68,7 @@ Str Functions
 - [x] [swapcase](https://docs.python.org/3/library/stdtypes.html#str.swapcase)
 - [x] [title](https://docs.python.org/3/library/stdtypes.html#str.title)
 - [] [translate](https://docs.python.org/3/library/stdtypes.html#str.translate)
-- [] [upper](https://docs.python.org/3/library/stdtypes.html#str.upper)
+- [x] [upper](https://docs.python.org/3/library/stdtypes.html#str.upper)
 - [] [zfill](https://docs.python.org/3/library/stdtypes.html#str.zfill)
 
 Other features
