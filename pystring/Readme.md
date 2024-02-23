@@ -69,7 +69,7 @@ Str Functions
 - [x] [title](https://docs.python.org/3/library/stdtypes.html#str.title)
 - [] [translate](https://docs.python.org/3/library/stdtypes.html#str.translate)
 - [x] [upper](https://docs.python.org/3/library/stdtypes.html#str.upper)
-- [] [zfill](https://docs.python.org/3/library/stdtypes.html#str.zfill)
+- [x] [zfill](https://docs.python.org/3/library/stdtypes.html#str.zfill)
 
 Other features
 - [ ] Support Template strings https://docs.python.org/3/library/string.html#template-strings
