@@ -66,7 +66,7 @@ Str Functions
 - [s] [startswith](https://docs.python.org/3/library/stdtypes.html#str.startswith)
 - [x] [strip](https://docs.python.org/3/library/stdtypes.html#str.strip)
 - [x] [swapcase](https://docs.python.org/3/library/stdtypes.html#str.swapcase)
-- [] [title](https://docs.python.org/3/library/stdtypes.html#str.title)
+- [x] [title](https://docs.python.org/3/library/stdtypes.html#str.title)
 - [] [translate](https://docs.python.org/3/library/stdtypes.html#str.translate)
 - [] [upper](https://docs.python.org/3/library/stdtypes.html#str.upper)
 - [] [zfill](https://docs.python.org/3/library/stdtypes.html#str.zfill)
