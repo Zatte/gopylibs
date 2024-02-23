@@ -44,7 +44,7 @@ Str Functions
 - [x] [isnumeric](https://docs.python.org/3/library/stdtypes.html#str.isnumeric)
 - [x] [isprintable](https://docs.python.org/3/library/stdtypes.html#str.isprintable)
 - [x] [isspace](https://docs.python.org/3/library/stdtypes.html#str.isspace)
-- [] [istitle](https://docs.python.org/3/library/stdtypes.html#str.istitle)
+- [x] [istitle](https://docs.python.org/3/library/stdtypes.html#str.istitle)
 - [] [isupper](https://docs.python.org/3/library/stdtypes.html#str.isupper)
 - [] [join](https://docs.python.org/3/library/stdtypes.html#str.join)
 - [] [ljust](https://docs.python.org/3/library/stdtypes.html#str.ljust)
