@@ -55,7 +55,7 @@ Str Functions
 - [x] [removeprefix](https://docs.python.org/3/library/stdtypes.html#str.removeprefix)
 - [x] [removesuffix](https://docs.python.org/3/library/stdtypes.html#str.removesuffix)
 - [x] [replace](https://docs.python.org/3/library/stdtypes.html#str.replace)
-- [] [rfind](https://docs.python.org/3/library/stdtypes.html#str.rfind)
+- [x] [rfind](https://docs.python.org/3/library/stdtypes.html#str.rfind)
 - [] [rindex](https://docs.python.org/3/library/stdtypes.html#str.rindex)
 - [] [rjust](https://docs.python.org/3/library/stdtypes.html#str.rjust)
 - [] [rpartition](https://docs.python.org/3/library/stdtypes.html#str.rpartition)
