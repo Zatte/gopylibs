@@ -60,7 +60,7 @@ Str Functions
 - [x] [rjust](https://docs.python.org/3/library/stdtypes.html#str.rjust)
 - [x] [rpartition](https://docs.python.org/3/library/stdtypes.html#str.rpartition)
 - [x] [rsplit](https://docs.python.org/3/library/stdtypes.html#str.rsplit)
-- [] [rstrip](https://docs.python.org/3/library/stdtypes.html#str.rstrip)
+- [x] [rstrip](https://docs.python.org/3/library/stdtypes.html#str.rstrip)
 - [] [split](https://docs.python.org/3/library/stdtypes.html#str.split)
 - [] [splitlines](https://docs.python.org/3/library/stdtypes.html#str.splitlines)
 - [] [startswith](https://docs.python.org/3/library/stdtypes.html#str.startswith)
