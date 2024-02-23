@@ -52,7 +52,7 @@ Str Functions
 - [x] [lstrip](https://docs.python.org/3/library/stdtypes.html#str.lstrip)
 - [] [maketrans](https://docs.python.org/3/library/stdtypes.html#str.maketrans)
 - [x] [partition](https://docs.python.org/3/library/stdtypes.html#str.partition)
-- [] [removeprefix](https://docs.python.org/3/library/stdtypes.html#str.removeprefix)
+- [x] [removeprefix](https://docs.python.org/3/library/stdtypes.html#str.removeprefix)
 - [] [removesuffix](https://docs.python.org/3/library/stdtypes.html#str.removesuffix)
 - [] [replace](https://docs.python.org/3/library/stdtypes.html#str.replace)
 - [] [rfind](https://docs.python.org/3/library/stdtypes.html#str.rfind)
