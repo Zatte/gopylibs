@@ -30,7 +30,7 @@ Str Functions
 - [] [encode](https://docs.python.org/3/library/stdtypes.html#str.encode)
 - [x] [endswith](https://docs.python.org/3/library/stdtypes.html#str.endswith)
 - [x] [expandtabs](https://docs.python.org/3/library/stdtypes.html#str.expandtabs)
-- [] [find](https://docs.python.org/3/library/stdtypes.html#str.find)
+- [x] [find](https://docs.python.org/3/library/stdtypes.html#str.find)
 - [] [format](https://docs.python.org/3/library/stdtypes.html#str.format)
 - [] [format_map](https://docs.python.org/3/library/stdtypes.html#str.format_map)
 - [] [index](https://docs.python.org/3/library/stdtypes.html#str.index)
