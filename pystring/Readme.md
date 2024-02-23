@@ -51,7 +51,7 @@ Str Functions
 - [x] [lower](https://docs.python.org/3/library/stdtypes.html#str.lower)
 - [x] [lstrip](https://docs.python.org/3/library/stdtypes.html#str.lstrip)
 - [] [maketrans](https://docs.python.org/3/library/stdtypes.html#str.maketrans)
-- [] [partition](https://docs.python.org/3/library/stdtypes.html#str.partition)
+- [x] [partition](https://docs.python.org/3/library/stdtypes.html#str.partition)
 - [] [removeprefix](https://docs.python.org/3/library/stdtypes.html#str.removeprefix)
 - [] [removesuffix](https://docs.python.org/3/library/stdtypes.html#str.removesuffix)
 - [] [replace](https://docs.python.org/3/library/stdtypes.html#str.replace)
