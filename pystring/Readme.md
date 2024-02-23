@@ -26,7 +26,7 @@ Str Functions
 - [x] [capitalize](https://docs.python.org/3/library/stdtypes.html#str.capitalize)
 - [x] [casefold](https://docs.python.org/3/library/stdtypes.html#str.casefold)
 - [x] [center](https://docs.python.org/3/library/stdtypes.html#str.center)
-- [] [count](https://docs.python.org/3/library/stdtypes.html#str.count)
+- [x] [count](https://docs.python.org/3/library/stdtypes.html#str.count)
 - [] [encode](https://docs.python.org/3/library/stdtypes.html#str.encode)
 - [] [endswith](https://docs.python.org/3/library/stdtypes.html#str.endswith)
 - [] [expandtabs](https://docs.python.org/3/library/stdtypes.html#str.expandtabs)
