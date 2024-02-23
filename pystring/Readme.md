@@ -38,7 +38,7 @@ Str Functions
 - [x] [isalpha](https://docs.python.org/3/library/stdtypes.html#str.isalpha)
 - [x] [isascii](https://docs.python.org/3/library/stdtypes.html#str.isascii)
 - [x] [isdecimal](https://docs.python.org/3/library/stdtypes.html#str.isdecimal)
-- [] [isdigit](https://docs.python.org/3/library/stdtypes.html#str.isdigit)
+- [x] [isdigit](https://docs.python.org/3/library/stdtypes.html#str.isdigit)
 - [] [isidentifier](https://docs.python.org/3/library/stdtypes.html#str.isidentifier)
 - [] [islower](https://docs.python.org/3/library/stdtypes.html#str.islower)
 - [] [isnumeric](https://docs.python.org/3/library/stdtypes.html#str.isnumeric)
