@@ -31,8 +31,8 @@ Str Functions
 - [x] [endswith](https://docs.python.org/3/library/stdtypes.html#str.endswith)
 - [x] [expandtabs](https://docs.python.org/3/library/stdtypes.html#str.expandtabs)
 - [x] [find](https://docs.python.org/3/library/stdtypes.html#str.find)
-- [] [format](https://docs.python.org/3/library/stdtypes.html#str.format)
-- [] [format_map](https://docs.python.org/3/library/stdtypes.html#str.format_map)
+- [x] [format](https://docs.python.org/3/library/stdtypes.html#str.format)
+- [x] [format_map](https://docs.python.org/3/library/stdtypes.html#str.format_map) - Aliased to format since the difference in golang is not relevant
 - [] [index](https://docs.python.org/3/library/stdtypes.html#str.index)
 - [] [isalnum](https://docs.python.org/3/library/stdtypes.html#str.isalnum)
 - [] [isalpha](https://docs.python.org/3/library/stdtypes.html#str.isalpha)
