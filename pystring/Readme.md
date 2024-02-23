@@ -40,7 +40,7 @@ Str Functions
 - [x] [isdecimal](https://docs.python.org/3/library/stdtypes.html#str.isdecimal)
 - [x] [isdigit](https://docs.python.org/3/library/stdtypes.html#str.isdigit)
 - [] [isidentifier](https://docs.python.org/3/library/stdtypes.html#str.isidentifier)
-- [] [islower](https://docs.python.org/3/library/stdtypes.html#str.islower)
+- [x] [islower](https://docs.python.org/3/library/stdtypes.html#str.islower)
 - [] [isnumeric](https://docs.python.org/3/library/stdtypes.html#str.isnumeric)
 - [] [isprintable](https://docs.python.org/3/library/stdtypes.html#str.isprintable)
 - [] [isspace](https://docs.python.org/3/library/stdtypes.html#str.isspace)
