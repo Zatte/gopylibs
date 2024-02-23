@@ -46,7 +46,7 @@ Str Functions
 - [x] [isspace](https://docs.python.org/3/library/stdtypes.html#str.isspace)
 - [x] [istitle](https://docs.python.org/3/library/stdtypes.html#str.istitle)
 - [x] [isupper](https://docs.python.org/3/library/stdtypes.html#str.isupper)
-- [] [join](https://docs.python.org/3/library/stdtypes.html#str.join)
+- [x] [join](https://docs.python.org/3/library/stdtypes.html#str.join) - Implemented as JoinString() & JoinStringer()
 - [] [ljust](https://docs.python.org/3/library/stdtypes.html#str.ljust)
 - [] [lower](https://docs.python.org/3/library/stdtypes.html#str.lower)
 - [] [lstrip](https://docs.python.org/3/library/stdtypes.html#str.lstrip)
