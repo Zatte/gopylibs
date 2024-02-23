@@ -4,19 +4,16 @@ An attempt to get as similar behavior as possible that exists in python.
 
 Source reference: https://docs.python.org/3/library/string.html#string.Formatter
 
-
 ## Dialects
-Occasionally, Python implementations may vary between versions, necessitating
+Occasionally, Python implementations may vary between versions necessitating
 specification of the Python version to achieve direct parity. The aim is to
 outline required feature flags necessary to attain compatibility in "dialects".
-
 
 ## Out of scope
 Python 2.X `(string % dict)` compatibility. 3.X is enough. Small PRs could be welcome if not too
 obstructive for maintainability.
 
 ## TODO
-
 Format() - Support locale aware formatting
 - [x] The 'z' option coerces negative zero floating-point values to positive zero after rounding to the format precision. This option is only valid for floating-point presentation types.
 - [ ] The ',' option signals the use of a comma for a thousands separator. For a locale aware separator, use the 'n' integer presentation type instead
@@ -24,6 +21,7 @@ Format() - Support locale aware formatting
 
 Str Functions
 - [x] [capitalize](https://docs.python.org/3/library/stdtypes.html#str.capitalize)
+- [x] [capwords](https://docs.python.org/3/library/string.html#string.capwords) - static strings utility
 - [x] [casefold](https://docs.python.org/3/library/stdtypes.html#str.casefold)
 - [x] [center](https://docs.python.org/3/library/stdtypes.html#str.center)
 - [x] [count](https://docs.python.org/3/library/stdtypes.html#str.count)
