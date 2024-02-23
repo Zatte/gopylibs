@@ -58,7 +58,7 @@ Str Functions
 - [x] [rfind](https://docs.python.org/3/library/stdtypes.html#str.rfind)
 - [] [rindex](https://docs.python.org/3/library/stdtypes.html#str.rindex)
 - [x] [rjust](https://docs.python.org/3/library/stdtypes.html#str.rjust)
-- [] [rpartition](https://docs.python.org/3/library/stdtypes.html#str.rpartition)
+- [x] [rpartition](https://docs.python.org/3/library/stdtypes.html#str.rpartition)
 - [] [rsplit](https://docs.python.org/3/library/stdtypes.html#str.rsplit)
 - [] [rstrip](https://docs.python.org/3/library/stdtypes.html#str.rstrip)
 - [] [split](https://docs.python.org/3/library/stdtypes.html#str.split)
