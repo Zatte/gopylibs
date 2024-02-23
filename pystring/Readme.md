@@ -34,7 +34,7 @@ Str Functions
 - [x] [format](https://docs.python.org/3/library/stdtypes.html#str.format)
 - [x] [format_map](https://docs.python.org/3/library/stdtypes.html#str.format_map) - Aliased to format since the difference in golang is not relevant
 - [] [index](https://docs.python.org/3/library/stdtypes.html#str.index)
-- [] [isalnum](https://docs.python.org/3/library/stdtypes.html#str.isalnum)
+- [x] [isalnum](https://docs.python.org/3/library/stdtypes.html#str.isalnum)
 - [] [isalpha](https://docs.python.org/3/library/stdtypes.html#str.isalpha)
 - [] [isascii](https://docs.python.org/3/library/stdtypes.html#str.isascii)
 - [] [isdecimal](https://docs.python.org/3/library/stdtypes.html#str.isdecimal)
