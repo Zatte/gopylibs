@@ -53,7 +53,7 @@ Str Functions
 - [] [maketrans](https://docs.python.org/3/library/stdtypes.html#str.maketrans)
 - [x] [partition](https://docs.python.org/3/library/stdtypes.html#str.partition)
 - [x] [removeprefix](https://docs.python.org/3/library/stdtypes.html#str.removeprefix)
-- [] [removesuffix](https://docs.python.org/3/library/stdtypes.html#str.removesuffix)
+- [x] [removesuffix](https://docs.python.org/3/library/stdtypes.html#str.removesuffix)
 - [] [replace](https://docs.python.org/3/library/stdtypes.html#str.replace)
 - [] [rfind](https://docs.python.org/3/library/stdtypes.html#str.rfind)
 - [] [rindex](https://docs.python.org/3/library/stdtypes.html#str.rindex)
