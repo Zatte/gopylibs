@@ -19,6 +19,9 @@ Format() - Support locale aware formatting
 - [ ] The ',' option signals the use of a comma for a thousands separator. For a locale aware separator, use the 'n' integer presentation type instead
 - [ ] The '_' option signals the use of an underscore for a thousands separator for floating point presentation types and for integer presentation type 'd'. For integer presentation types 'b', 'o', 'x', and 'X', underscores will be inserted every 4 digits. For other presentation types, specifying this option is an error.
 
+Other features
+- [ ] Support Template strings https://docs.python.org/3/library/string.html#template-strings
+
 Str Functions
 - [x] [capitalize](https://docs.python.org/3/library/stdtypes.html#str.capitalize)
 - [x] [capwords](https://docs.python.org/3/library/string.html#string.capwords) - static strings utility
@@ -70,6 +73,3 @@ Low Priority
 - [] [isidentifier](https://docs.python.org/3/library/stdtypes.html#str.isidentifier) - not too relevant outside python.
 - [] [index](https://docs.python.org/3/library/stdtypes.html#str.index) - have find without errors.
 - [] [rindex](https://docs.python.org/3/library/stdtypes.html#str.rindex) - Have rfind without errors
-
-Other features
-- [ ] Support Template strings https://docs.python.org/3/library/string.html#template-strings
