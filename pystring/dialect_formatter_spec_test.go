@@ -94,6 +94,11 @@ func TestValidExpressionsCanFormatValues(t *testing.T) {
 				t.Errorf("Expected no error but got: %v for expr: %s", err, expr)
 				return
 			}
+		} else if expr.ExpectNumericType() {
+			if _, err := expr.Format(167800119); err != nil {
+				t.Errorf("Expected no error but got: %v for expr: %s", err, expr)
+				return
+			}
 		} else if expr.Sign == 0 && expr.Fill != ' ' {
 			if _, err := expr.Format("foobar"); err != nil {
 				t.Errorf("Expected no error but got: %v for expr: %s", err, expr)
@@ -128,8 +133,28 @@ func TestCoarceNegativeZeroWithZ(t *testing.T) {
 
 func TestPastFailures(t *testing.T) {
 	// Special cases we don't want to forget about.
+	mustEvalToMatch(t, DefaultDialect, " #1b", 16789, " 0b100000110010101")
+	mustEvalToMatch(t, DefaultDialect, "#1b", 16789,  "0b100000110010101")
+
+	mustEvalToMatch(t, DefaultDialect, "2.1", "foobar", "f ")
+
+	mustEvalToMatch(t, DefaultDialect, "02.1", "foobar", "f0")
+
+	mustEvalToMatch(t, DefaultDialect, "#10o", 16789, "   0o40625")
+
+	mustEvalToMatch(t, DefaultDialect, "#030_x", 100000000, "0x000_0000_0000_0000_05f5_e100")
+
+	mustEvalToMatch(t, DefaultDialect, "#_b", 16789, "0b100_0001_1001_0101")
+
+	mustEvalToMatch(t, DefaultDialect, "#10,d", 16789, "    16,789")
+	mustEvalToMatch(t, DefaultDialect, "#010_o", 0o0040625, "0o004_0625")
+
+	mustEvalToMatch(t, DefaultDialect, "#0_b", 167, "0b1010_0111")
+	mustEvalToMatch(t, DefaultDialect, "#0,d", 16789, "16,789")
+
 	mustEvalToError(t, DefaultDialect, " 0", "foobar")
 	mustEvalToMatch(t, DefaultDialect, "010", "foobar", "foobar0000")
+
 	mustEvalToMatch(t, DefaultDialect, "#010d", 16789, "0000016789")
 	mustEvalToMatch(t, DefaultDialect, ",=-10.5G", 77.11121111111112, ",,,,77.111")
 	mustEvalToMatch(t, DefaultDialect, "A=#x", -53, "-0x35")
@@ -348,6 +373,7 @@ func getValidExpressions(d Dialect) []FormatSpec {
 	validAlternate := []bool{true, false}
 	validZeroPadding := []bool{true, false}
 	validWidths := []uint{0, 1, 2, 3, 10, 20, 30, 100}
+	validGroupings := []rune{0, ',', '_'}
 	validPrecisions := []uint{0, 1, 2, 5, 10, 15, 20, 30}
 
 	res := make([]FormatSpec, 0, len(validFills)*len(validAligns)*len(validSigns)*len(validAlternate)*len(validZeroPadding)*len(validWidths)*len(validPrecisions)*len(ValidTypes))
@@ -357,21 +383,24 @@ func getValidExpressions(d Dialect) []FormatSpec {
 				for _, alternate := range validAlternate {
 					for _, zeroPadding := range validZeroPadding {
 						for _, width := range validWidths {
-							for _, precision := range validPrecisions {
-								for _, t := range ValidTypes {
-									spec := FormatSpec{
-										dialect:     d,
-										Fill:        fill,
-										Align:       align,
-										Sign:        sign,
-										Alternate:   alternate,
-										ZeroPadding: zeroPadding,
-										MinWidth:    width,
-										Precision:   precision,
-										Type:        t,
-									}
-									if err := spec.Validate(); err == nil {
-										res = append(res, spec)
+							for _, _ = range validGroupings {
+								for _, precision := range validPrecisions {
+									for _, t := range ValidTypes {
+										spec := FormatSpec{
+											dialect:        d,
+											Fill:           fill,
+											Align:          align,
+											Sign:           sign,
+											Alternate:      alternate,
+											ZeroPadding:    zeroPadding,
+											MinWidth:       width,
+											GroupingOption: 0,
+											Precision:      precision,
+											Type:           t,
+										}
+										if err := spec.Validate(); err == nil {
+											res = append(res, spec)
+										}
 									}
 								}
 							}
@@ -400,7 +429,7 @@ func mustEvalToMatch(t *testing.T, d Dialect, template string, val any, expected
 		t.Fatalf("Failed to format spec: %s", err)
 	}
 	if s != expected {
-		t.Fatalf("Expected: %s, got: %s", expected, s)
+		t.Fatalf("Expected: '%s', got: '%s'", expected, s)
 	}
 }
 

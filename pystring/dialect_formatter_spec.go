@@ -12,6 +12,7 @@ import (
 )
 
 // FormatSpec represents the format specification for formatting values
+// format_spec     ::=  [[fill]align][sign]["z"]["#"]["0"][width][grouping_option]["." precision][type]
 type FormatSpec struct {
 	dialect             Dialect
 	Fill                rune // Fill character
@@ -21,6 +22,7 @@ type FormatSpec struct {
 	Alternate           bool // Alternate form ('#' for alternative form)
 	ZeroPadding         bool // Zero padding ('0' for zero padding)
 	MinWidth            uint // Minimum width
+	GroupingOption      rune // Grouping option (',' or '_')
 	Precision           uint // Precision
 	Type                rune // Type character ('b', 'c', 'd', 'o', 'x', 'X', 'e', 'E', 'f', 'F', 'g', 'G', '%')
 }
@@ -65,32 +67,38 @@ func (d Dialect) NewFormatterSpecFromStr(format string) (FormatSpec, error) {
 
 		case '+', '-', ' ':
 			if spec.Sign != 0 || spec.CoercesNegativeZero || spec.Alternate || spec.MinWidth > 0 || spec.Precision > 0 || spec.Type != 0 {
-				return spec, fmt.Errorf("%w: Invalid format specifier '%s' - unexpected1 '%s' ", ErrValue, format, string(char))
+				return spec, fmt.Errorf("%w: Invalid format specifier '%s' - unexpected sign '%s' ", ErrValue, format, string(char))
 			}
 			spec.Sign = char
 
 		case 'z':
 			if !spec.dialect.enableCoercesNegativeZeroToPositive {
-				return spec, fmt.Errorf("%w: Invalid format specifier '%s' - unexpected2 '%s' ", ErrValue, format, string(char))
+				return spec, fmt.Errorf("%w: Invalid format specifier '%s' - unexpected float coercion sign '%s' ", ErrValue, format, string(char))
 			}
 			if spec.CoercesNegativeZero || spec.Alternate || spec.MinWidth > 0 || spec.Precision > 0 || spec.Type != 0 {
-				return spec, fmt.Errorf("%w: Invalid format specifier '%s' - unexpected2 '%s' ", ErrValue, format, string(char))
+				return spec, fmt.Errorf("%w: Invalid format specifier '%s' - unexpected float coercion sign '%s' ", ErrValue, format, string(char))
 			}
 			spec.CoercesNegativeZero = true
 
 		case '#':
 			if spec.Alternate || spec.MinWidth > 0 || spec.Precision > 0 || spec.Type != 0 {
-				return spec, fmt.Errorf("%w: Invalid format specifier '%s' - unexpected2 '%s' ", ErrValue, format, string(char))
+				return spec, fmt.Errorf("%w: Invalid format specifier '%s' - unexpected alternative sign '%s' ", ErrValue, format, string(char))
 			}
 			spec.Alternate = true
 
+		case '_', ',':
+			if spec.Precision > 0 || spec.Type != 0 {
+				return spec, fmt.Errorf("%w: Invalid format specifier '%s' - unexpected grouping sign '%s' ", ErrValue, format, string(char))
+			}
+			spec.GroupingOption = char
+
 		case '.':
 			if spec.Precision != 0 || spec.Type != 0 || idx+1 >= len(format) {
-				return spec, fmt.Errorf("%w: Invalid format specifier '%s' - unexpected3 '%s' ", ErrValue, format, string(char))
+				return spec, fmt.Errorf("%w: Invalid format specifier '%s' - unexpected precision '%s' ", ErrValue, format, string(char))
 			}
 			r, _ := utf8.DecodeRuneInString(format[idx+1:])
 			if r == utf8.RuneError || !unicode.IsDigit(r) {
-				return spec, fmt.Errorf("%w: Invalid format specifier '%s' - unexpected4 '%s' ", ErrValue, format, string(r))
+				return spec, fmt.Errorf("%w: Invalid format specifier '%s' - unexpected precision '%s' ", ErrValue, format, string(r))
 			}
 
 			firstDigit := format[idx+1:]
@@ -105,7 +113,7 @@ func (d Dialect) NewFormatterSpecFromStr(format string) (FormatSpec, error) {
 
 		case 'b', 'c', 'd', 'o', 'x', 'X', 'e', 'E', 'f', 'F', 'g', 'G', '%', 'n', 's':
 			if spec.Type != 0 {
-				return spec, fmt.Errorf("%w: Invalid format specifier '%s' - unexpected5 '%s' ", ErrValue, format, string(char))
+				return spec, fmt.Errorf("%w: Invalid format specifier '%s' - unexpected type '%s' ", ErrValue, format, string(char))
 			}
 			spec.Type = char
 
@@ -113,13 +121,12 @@ func (d Dialect) NewFormatterSpecFromStr(format string) (FormatSpec, error) {
 			// MinWidth
 			if unicode.IsDigit(char) {
 				if spec.Type != 0 || spec.Precision > 0 {
-					return spec, fmt.Errorf("%w: Invalid format specifier '%s' - unexpected6 '%s' ", ErrValue, format, string(char))
+					return spec, fmt.Errorf("%w: Invalid format specifier '%s' - unexpected minwidth '%s' ", ErrValue, format, string(char))
 				}
 
 				if char == '0' {
+					// This setting may affect alignment and fill but that depends on the dialect and data type passed.
 					spec.ZeroPadding = true
-					//spec.Fill = '0'
-					//spec.Align = '='
 					continue
 				}
 
@@ -166,6 +173,9 @@ func (f FormatSpec) String() string {
 	if f.MinWidth > 0 {
 		res += strconv.Itoa(int(f.MinWidth))
 	}
+	if f.GroupingOption != 0 {
+		res += string(f.GroupingOption)
+	}
 	if f.Precision > 0 {
 		res += fmt.Sprintf(".%d", f.Precision)
 	}
@@ -202,6 +212,10 @@ func (f FormatSpec) TypeIsValid() bool {
 		f.Type == 0
 }
 
+func (f FormatSpec) GroupingOptionIsValid() bool {
+	return f.GroupingOption == '_' || f.GroupingOption == ',' || f.GroupingOption == 0
+}
+
 func (f FormatSpec) ExpectFloatType() bool {
 	return f.Type == 'e' || f.Type == 'E' || f.Type == 'f' || f.Type == 'F' || f.Type == 'g' || f.Type == 'G' || f.Type == '%'
 }
@@ -211,7 +225,7 @@ func (f FormatSpec) ExpectIntType() bool {
 }
 
 func (f FormatSpec) ExpectNumericType() bool {
-	return f.ExpectFloatType() || f.ExpectIntType() || f.Sign != 0 || f.Align == '='
+	return f.ExpectFloatType() || f.ExpectIntType() || f.Sign != 0 || f.Align == '=' || f.GroupingOption != 0 || f.Alternate
 }
 
 func (f FormatSpec) ExpectStringType() bool {
@@ -228,6 +242,9 @@ func (f FormatSpec) Validate() error {
 	if !f.TypeIsValid() {
 		return fmt.Errorf("%w: Invalid type character: %c", ErrValue, f.Type)
 	}
+	if !f.GroupingOptionIsValid() {
+		return fmt.Errorf("%w: Invalid grouping option: %c", ErrValue, f.GroupingOption)
+	}
 
 	if f.ExpectIntType() && f.Precision > 0 {
 		return fmt.Errorf("%w: Precision only allowed for float types, not %c", ErrValue, f.Type)
@@ -240,8 +257,15 @@ func (f FormatSpec) Validate() error {
 	if expectString && f.Align == '=' {
 		return fmt.Errorf("%w: '=' alignment not allowed with string format specifier 's'", ErrValue)
 	}
+	if expectString && f.GroupingOption != 0 {
+		return fmt.Errorf("%w: '=' grouping only allowed with float and int types", ErrValue)
+	}
 
-	if f.Alternate && !f.ExpectIntType() {
+	if f.GroupingOption != 0 && (f.Type != 'd' && f.Type != 'b' && f.Type != 'o' && f.Type != 'x' && f.Type != 'X') {
+		return fmt.Errorf("%w: Cannot specify '%s' with '%s'.", ErrValue, string(f.GroupingOption), string(f.Type))
+	}
+
+	if f.Alternate && !f.ExpectIntType() && f.Type != 0 {
 		return fmt.Errorf("%w: Alternate form (#) only allowed with integer types, not %c", ErrValue, f.Type)
 	}
 	if f.Alternate && f.Type == 'c' {
@@ -257,81 +281,146 @@ func (f FormatSpec) Validate() error {
 	return nil
 }
 
+func (f FormatSpec) updateSpecWithDataCategory(valueCat ValueCategory) FormatSpec {
+	switch valueCat {
+	case ValueCategoryString:
+		// Changed in version 3.10: Preceding the width field by '0' no longer affects the default alignment for strings.
+		if f.ZeroPadding {
+			if f.Align == 0 && f.dialect.zeroPaddingAlignment != 0 {
+				f.Align = f.dialect.zeroPaddingAlignment
+			}
+			if f.Fill == 0 {
+				f.Fill = '0'
+			}
+		}
+
+	case ValueCategoryBool:
+	case ValueCategoryInt, ValueCategoryFloat:
+		// When no explicit alignment is given, preceding the width field by a zero ('0') character enables sign-aware
+		// zero-padding for numeric types. This is equivalent to a fill character of '0' with an alignment type of '='.
+		// Changed in version 3.10: Preceding the width field by '0' no longer affects the default alignment for strings.
+		if f.ZeroPadding {
+			if f.Align == 0 {
+				f.Align = '='
+			}
+			if f.Fill == 0 {
+				f.Fill = '0'
+			}
+		}
+	}
+
+	return f
+}
+
 func (f FormatSpec) Format(v any) (string, error) {
 	s, valueCat, err := f.FormatValue(v)
 	if err != nil {
 		return "", err
 	}
 
-	// Maybe perform padding.
-	if f.MinWidth == 0 {
+	f = f.updateSpecWithDataCategory(valueCat)
+
+	// Can we skip padding and grouping?
+	if f.MinWidth == 0 && f.GroupingOption == 0 {
 		return s, nil
 	}
 
 	// defaults
-	if f.ZeroPadding && f.Fill == 0 {
-		f.Fill = '0'
-		if f.Align == 0 && f.dialect.zeroPaddingAlignment != 0 {
-			f.Align = f.dialect.zeroPaddingAlignment
-		}
-	}
 	if f.Fill == 0 {
 		f.Fill = ' '
 	}
+	if f.Align == 0 {
+		f.Align = '<' // the default for most objects
 
-	requiredPadding := int(f.MinWidth) - utf8.RuneCountInString(s)
-	if requiredPadding <= 0 {
-		return s, nil
+		if valueCat == ValueCategoryFloat || valueCat == ValueCategoryInt {
+			f.Align = '>' // default for numbers
+		}
 	}
 
 	sign := ""
-	if strings.HasPrefix(s, "-") {
-		sign = "-"
-	} else if f.Sign == ' ' {
-		sign = " "
-	} else if f.Sign == '+' {
-		sign = "+"
-	}
-	s = strings.Trim(s, sign)
-
-	switch {
-	case f.Alternate && f.Fill == '0' && f.Type == 'o':
-		sign += "0o"
-		s = strings.TrimPrefix(s, "0o")
-
-	case f.Alternate && f.Fill == '0' && f.Type == 'x':
-		sign += "0x"
-		s = strings.TrimPrefix(s, "0x")
-
-	case f.Alternate && f.Fill == '0' && f.Type == 'X':
-		sign += "0X"
-		s = strings.TrimPrefix(s, "0X")
-
-	case f.Alternate && f.Fill == '0' && f.Type == 'b':
-		sign += "0b"
-		s = strings.TrimPrefix(s, "0b")
-	}
-
-	// Set sane default in case of missing alignment.
-	if f.Align == 0 {
-		f.Align = '>'
-		if valueCat == ValueCategoryString {
-			f.Align = '<'
+	if valueCat == ValueCategoryFloat || valueCat == ValueCategoryInt {
+		if strings.HasPrefix(s, "-") {
+			sign = "-"
+		} else if f.Sign == ' ' {
+			sign = " "
+		} else if f.Sign == '+' {
+			sign = "+"
 		}
+		s = strings.Trim(s, sign)
+	}
+
+	if f.Alternate {
+		switch {
+		case f.Type == 'o':
+			sign += "0o"
+			s = strings.TrimPrefix(s, "0o")
+
+		case f.Type == 'x':
+			sign += "0x"
+			s = strings.TrimPrefix(s, "0x")
+
+		case f.Type == 'X':
+			sign += "0X"
+			s = strings.TrimPrefix(s, "0X")
+
+		case f.Type == 'b':
+			sign += "0b"
+			s = strings.TrimPrefix(s, "0b")
+		}
+	}
+
+	groupingInterval := 3
+	if f.Type == 'b' || f.Type == 'x' || f.Type == 'X' || f.Type == 'o' {
+		groupingInterval = 4
+	}
+	if f.GroupingOption != 0 && (valueCat == ValueCategoryFloat || valueCat == ValueCategoryInt) {
+		tmp := []string{}
+		for sLen := len(s); sLen > 0; sLen = len(s) {
+			// First batch might be smaller than the grouping interval.
+			take := sLen % groupingInterval
+			if take == 0 {
+				take = groupingInterval
+			}
+			tmp = append(tmp, s[:take])
+			s = s[take:]
+		}
+
+		s = strings.Join(tmp, string(f.GroupingOption))
+	}
+
+	sLen := utf8.RuneCountInString(s)
+	requiredPadding := int(f.MinWidth) - sLen - utf8.RuneCountInString(sign)
+	// Avoid panics in strings.Repeat
+	if requiredPadding < 0 {
+		requiredPadding = 0
 	}
 
 	switch f.Align {
 	case '<':
 		return sign + s + strings.Repeat(string(f.Fill), requiredPadding), nil
-	case '>', 0:
-		return sign + strings.Repeat(string(f.Fill), requiredPadding) + s, nil
-	case '=':
-
-		return sign + strings.Repeat(string(f.Fill), requiredPadding) + s, nil
+	case '>':
+		return strings.Repeat(string(f.Fill), requiredPadding) + sign + s, nil
 	case '^':
 		leftPad := requiredPadding / 2
 		rightPad := requiredPadding - leftPad
 		return strings.Repeat(string(f.Fill), leftPad) + sign + s + strings.Repeat(string(f.Fill), rightPad), nil
+
+	case '=', 0:
+		var res strings.Builder
+
+		res.WriteString(sign)
+		for i := 0; i < requiredPadding; i++ {
+			posFromLast := (requiredPadding + sLen) - i
+			writePadding := (posFromLast)%(groupingInterval+1) == 0
+			if writePadding && f.GroupingOption != 0 {
+				res.WriteRune(f.GroupingOption)
+			} else {
+				res.WriteRune(f.Fill)
+			}
+		}
+		res.WriteString(s)
+
+		return res.String(), nil
 	}
 	return s, nil
 
@@ -358,6 +447,12 @@ func (f FormatSpec) FormatValue(v any) (string, ValueCategory, error) {
 		}
 		if f.Sign != 0 {
 			return "", ValueCategoryString, fmt.Errorf("%w: Sign not allowed in string format specifier", ErrValue)
+		}
+		if f.Alternate {
+			return "", ValueCategoryString, fmt.Errorf("%w: Alternate form (#) not allowed in string format specifier", ErrValue)
+		}
+		if f.GroupingOption != 0 {
+			return "", ValueCategoryString, fmt.Errorf("%w: Cannot specify '%s' with 's'", ErrValue, string(f.GroupingOption))
 		}
 
 		// Truncation needed?

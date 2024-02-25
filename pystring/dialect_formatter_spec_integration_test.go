@@ -31,7 +31,7 @@ func TestValidExpressionsMatchesPython_311(t *testing.T) {
 				t.Errorf("Expected no error from python but got: %v", err)
 			}
 			if s != ps {
-				t.Fatalf("Different response from Go/Python. Go:'%s' != Py:'%s' for expression: %s (%#v)", s, ps, expr.String(), expr)
+				t.Fatalf("Different response from Go/Python. Go:'%s' != Py:'%s' for expression: %s (%#v)", s, ps, expr.String(), v)
 			}
 
 		} else if expr.ExpectIntType() {
@@ -45,7 +45,7 @@ func TestValidExpressionsMatchesPython_311(t *testing.T) {
 				t.Errorf("Expected no error from python but got: %v", err)
 			}
 			if s != ps {
-				t.Fatalf("Different response from Go/Python. Go:'%s' != Py:'%s' for expression: %s (%#v)", s, ps, expr.String(), expr)
+				t.Fatalf("Different response from Go/Python. Go:'%s' != Py:'%s' for expression: %s (%#v)", s, ps, expr.String(), v)
 			}
 		} else {
 			v := "foobar"
@@ -55,10 +55,10 @@ func TestValidExpressionsMatchesPython_311(t *testing.T) {
 				t.Errorf("go and python to have same success but got GoErr:%v != PyErr =%v", goErr, PyErr)
 			}
 			if goErr != nil || PyErr != nil {
-				return
+				continue
 			}
 			if s != ps {
-				t.Fatalf("Different response from Go/Python. Go:'%s' != Py:'%s' for expression: %s (%#v)", s, ps, expr.String(), expr)
+				t.Fatalf("Different response from Go/Python. Go:'%s' != Py:'%s' for expression: %s (%#v)", s, ps, expr.String(), v)
 			}
 		}
 	}
