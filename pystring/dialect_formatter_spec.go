@@ -265,9 +265,14 @@ func (f FormatSpec) Validate() error {
 		return fmt.Errorf("%w: Cannot specify '%s' with '%s'.", ErrValue, string(f.GroupingOption), string(f.Type))
 	}
 
-	if f.Alternate && !f.ExpectIntType() && f.Type != 0 {
+	expectedIntType := f.ExpectIntType()
+	if f.Alternate && !expectedIntType && f.Type != 0 {
 		return fmt.Errorf("%w: Alternate form (#) only allowed with integer types, not %c", ErrValue, f.Type)
 	}
+	if expectedIntType && f.Precision > 0 {
+		return fmt.Errorf("%w: Precision not allowed with integer format specifier '%c'", ErrValue, f.Type)
+	}
+
 	if f.Alternate && f.Type == 'c' {
 		return fmt.Errorf("%w: Alternate form (#) not allowed with integer format specifier '%c'", ErrValue, f.Type)
 	}
@@ -442,9 +447,9 @@ func (f FormatSpec) FormatValue(v any) (string, ValueCategory, error) {
 	case string:
 
 		// Only added for compatibility with python.
-		if f.Fill == ' ' {
-			return "", ValueCategoryString, fmt.Errorf("%w: Space not allowed in string format specifier", ErrValue)
-		}
+		//if f.Fill == ' ' {
+		//	return "", ValueCategoryString, fmt.Errorf("%w: Space not allowed in string format specifier", ErrValue)
+		//}
 		if f.Sign != 0 {
 			return "", ValueCategoryString, fmt.Errorf("%w: Sign not allowed in string format specifier", ErrValue)
 		}
@@ -571,6 +576,11 @@ func (f FormatSpec) FormatBool(value bool) (string, error) {
 
 // FormatInt formats an integer according to the given type.
 func (f FormatSpec) FormatInt(value int64) (string, error) {
+
+	if f.Precision > 0 {
+		return "", fmt.Errorf("%w: Precision not allowed with integer format specifier", ErrValue)
+	}
+
 	valueStr, err := f.formatInt(value)
 	if err != nil {
 		return "", err

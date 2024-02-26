@@ -22,44 +22,68 @@ func TestValidExpressionsMatchesPython_311(t *testing.T) {
 		expr.dialect = dialect
 		if expr.ExpectFloatType() {
 			v := 1.123456789
-			s, err := expr.Format(v)
-			if err != nil {
-				t.Errorf("Expected no error from golang Format() but got: %v", err)
+			s, goErr := expr.Format(v)
+			ps, _, pyErr := getPythonRes(pythonCmd, fmt.Sprintf("{0:%s}", expr.String()), []any{v})
+			if goErr != nil && pyErr == nil || goErr == nil && pyErr != nil {
+				t.Errorf("Error miss match between golang and python of format '%s': goErr: %v, pyErr: %v", expr.String(), goErr, pyErr)
 			}
-			ps, _, err := getPythonRes(pythonCmd, fmt.Sprintf("{0:%s}", expr.String()), []any{v})
-			if err != nil {
-				t.Errorf("Expected no error from python but got: %v", err)
+			if goErr != nil || pyErr != nil {
+				continue
 			}
 			if s != ps {
-				t.Fatalf("Different response from Go/Python. Go:'%s' != Py:'%s' for expression: %s (%#v)", s, ps, expr.String(), v)
+				t.Errorf("Different response from Go/Python. Go:'%s' != Py:'%s' for expression: %s (%#v)", s, ps, expr.String(), v)
 			}
+
+			//t.Logf("Go: '%s' == Py:'%s' for expression: %s ", s, ps, expr.String())
 
 		} else if expr.ExpectIntType() {
 			v := 16789
-			s, err := expr.Format(v)
-			if err != nil {
-				t.Errorf("Expected no error from golang Format() but got: %v", err)
+			s, goErr := expr.Format(v)
+			ps, _, pyErr := getPythonRes(pythonCmd, fmt.Sprintf("{0:%s}", expr.String()), []any{v})
+			if goErr != nil && pyErr == nil || goErr == nil && pyErr != nil {
+				t.Errorf("Error miss match between golang and python of format '%s': goErr: %v, pyErr: %v", expr.String(), goErr, pyErr)
 			}
-			ps, _, err := getPythonRes(pythonCmd, fmt.Sprintf("{0:%s}", expr.String()), []any{v})
-			if err != nil {
-				t.Errorf("Expected no error from python but got: %v", err)
+			if goErr != nil || pyErr != nil {
+				continue
 			}
 			if s != ps {
-				t.Fatalf("Different response from Go/Python. Go:'%s' != Py:'%s' for expression: %s (%#v)", s, ps, expr.String(), v)
+				t.Errorf("Different response from Go/Python. Go:'%s' != Py:'%s' for expression: %s (%#v)", s, ps, expr.String(), v)
 			}
+
+			//t.Logf("Go: '%s' == Py:'%s' for expression: %s ", s, ps, expr.String())
+
+		} else if expr.ExpectNumericType() {
+			v := 16789
+			s, goErr := expr.Format(v)
+			ps, _, pyErr := getPythonRes(pythonCmd, fmt.Sprintf("{0:%s}", expr.String()), []any{v})
+			if goErr != nil && pyErr == nil || goErr == nil && pyErr != nil {
+				t.Errorf("Error miss match between golang and python of format '%s': goErr: %v, pyErr: %v", expr.String(), goErr, pyErr)
+			}
+			if goErr != nil || pyErr != nil {
+				continue
+			}
+			if s != ps {
+				t.Errorf("Different response from Go/Python. Go:'%s' != Py:'%s' for expression: %s (%#v)", s, ps, expr.String(), v)
+			}
+
+			//t.Logf("Go: '%s' == Py:'%s' for expression: %s ", s, ps, expr.String())
+
 		} else {
 			v := "foobar"
 			s, goErr := expr.Format(v)
-			ps, _, PyErr := getPythonRes(pythonCmd, fmt.Sprintf("{0:%s}", expr.String()), []any{v})
-			if goErr != nil && PyErr == nil || goErr == nil && PyErr != nil {
-				t.Errorf("go and python to have same success but got GoErr:%v != PyErr =%v", goErr, PyErr)
+			ps, _, pyErr := getPythonRes(pythonCmd, fmt.Sprintf("{0:%s}", expr.String()), []any{v})
+			if goErr != nil && pyErr == nil || goErr == nil && pyErr != nil {
+				t.Fatalf("Error miss match between golang and python of format '%s': goErr: %v, pyErr: %v", expr.String(), goErr, pyErr)
 			}
-			if goErr != nil || PyErr != nil {
+			if goErr != nil || pyErr != nil {
 				continue
 			}
 			if s != ps {
 				t.Fatalf("Different response from Go/Python. Go:'%s' != Py:'%s' for expression: %s (%#v)", s, ps, expr.String(), v)
 			}
+
+			//t.Logf("Go: '%s' == Py:'%s' for expression: %s ", s, ps, expr.String())
+
 		}
 	}
 }
