@@ -1,4 +1,4 @@
-package pybool
+package pyint
 
 import (
 	"math/bits"

@@ -1,8 +1,9 @@
-package pybool
+package pyfloat
 
 import (
 	"fmt"
 	"math/big"
+	"strings"
 )
 
 type PyFloat float64
@@ -29,5 +30,10 @@ func (pf PyFloat) IsInteger() bool {
 }
 
 func (pf PyFloat) Hex() string {
-	return fmt.Sprintf("%#x", float64(pf))
+	hexVal := fmt.Sprintf("%#.13x", float64(pf))
+
+	// strip the leading zeros padding on the exponent
+	hexVal = strings.Replace(hexVal, "p+0", "p+", 1)
+
+	return hexVal
 }
