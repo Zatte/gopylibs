@@ -2,15 +2,13 @@ package pystring
 
 import (
 	"testing"
-
-	"github.com/zatte/gopylibs/pybool"
 )
 
 func TestEndsWith(t *testing.T) {
 	tests := []struct {
 		str    string
 		subStr PyString
-		res    pybool.PyBool
+		res    bool
 	}{
 		{str: "", subStr: "", res: true},
 		{str: "12345", subStr: "", res: true},

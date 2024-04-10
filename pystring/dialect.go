@@ -9,8 +9,20 @@ var DialectPython3_10 = NewDialect(3.10)
 var DialectPython3_0 = NewDialect(3.0)
 
 type Dialect struct {
-	zeroPaddingAlignment                rune
-	tryTypeJugglingString               bool
+	// Enabled strings to first be converted to numeric values before failing type validations
+	// that require numeric values.
+	// e.g.
+	// 'foo={:=-10.5G}'.format(42.1234) => always correct
+	// 'foo={:=-10.5G}'.format("42.1234") => fails if not set to true.
+	// This is not how python works but can simplify usage where even numbers
+	// are often provided as strings.
+	// NOTE: BETA feature
+	tryTypeJugglingString bool
+
+	// added in 3.10
+	zeroPaddingAlignment rune
+
+	// Added in 3.11
 	enableCoercesNegativeZeroToPositive bool
 }
 

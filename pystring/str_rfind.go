@@ -13,7 +13,7 @@ func RFind(s string, substr string, start, end *int) int {
 		return 0
 	}
 
-	s = Idx(s, start, end)
+	s, _ = Idx(s, start, end)
 	return strings.LastIndex(s, substr)
 }
 

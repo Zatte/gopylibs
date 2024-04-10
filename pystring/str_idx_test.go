@@ -21,6 +21,12 @@ func TestIndex(t *testing.T) {
 			want:  "hello",
 		},
 		{
+			s:     "",
+			start: nil,
+			end:   nil,
+			want:  "",
+		},
+		{
 			s:     "hello",
 			start: intP(0),
 			end:   intP(-100),
@@ -65,7 +71,7 @@ func TestIndex(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.s, func(t *testing.T) {
-			if got := PyString(tt.s).Idx(tt.start, tt.end); string(got) != tt.want {
+			if got, _ := PyString(tt.s).Idx(tt.start, tt.end); string(got) != tt.want {
 				switch {
 				case tt.start == nil && tt.end == nil:
 					t.Errorf("%q.Index(nil, nil) = %v, want %v", tt.s, got, tt.want)

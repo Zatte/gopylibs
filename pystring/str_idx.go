@@ -2,16 +2,16 @@ package pystring
 
 // Idx replicates indexing behavior in python. As such it supports negative
 // indexing and don't crash on out of bound indexes.
-func Idx(s string, start, end *int) string {
+func Idx(s string, start, end *int) (string, error) {
 	sLen := len(s)
 	actualStart := 0
 	actualEnd := len(s)
 	if end != nil {
-		if *end < 0 {
-			actualEnd = sLen + *end
-		}
 		if *end < sLen {
 			actualEnd = *end
+		}
+		if *end < 0 {
+			actualEnd = sLen + *end
 		}
 		if actualEnd < 0 {
 			actualEnd = 0
@@ -29,11 +29,16 @@ func Idx(s string, start, end *int) string {
 		}
 	}
 
-	return s[actualStart:actualEnd]
+	if actualEnd < actualStart || actualStart < 0 || actualEnd < 0 || actualStart > sLen || actualEnd > sLen {
+		return "", ErrIndex
+	}
+
+	return s[actualStart:actualEnd], nil
 }
 
 // Idx replicates indexing behavior in python. As such it supports negative
 // indexing and don't crash on out of bound indexes.
-func (pys PyString) Idx(start, end *int) PyString {
-	return PyString(Idx(string(pys), start, end))
+func (pys PyString) Idx(start, end *int) (PyString, error) {
+	r, err := Idx(string(pys), start, end)
+	return PyString(r), err
 }

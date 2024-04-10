@@ -6,7 +6,7 @@ import "strings"
 //
 // If sub is empty, returns the number of empty strings between characters which is the length of the string plus one.
 func Count(s, subStr string, start, end *int) int {
-	s = Idx(s, start, end)
+	s, _ = Idx(s, start, end)
 	return strings.Count(s, subStr)
 }
 

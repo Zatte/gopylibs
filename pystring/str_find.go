@@ -8,7 +8,7 @@ import (
 // suffix can also be a tuple of suffixes to look for. With optional start, test
 // beginning at that position. With optional end, stop comparing at that position.
 func Find(s, subStr string, start, end *int) int {
-	s = Idx(s, start, end)
+	s, _ = Idx(s, start, end)
 	if s == "" {
 		return 0
 	}

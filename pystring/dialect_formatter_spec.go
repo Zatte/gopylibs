@@ -217,7 +217,7 @@ func (f FormatSpec) GroupingOptionIsValid() bool {
 }
 
 func (f FormatSpec) ExpectFloatType() bool {
-	return f.Type == 'e' || f.Type == 'E' || f.Type == 'f' || f.Type == 'F' || f.Type == 'g' || f.Type == 'G' || f.Type == '%'
+	return f.Type == 'e' || f.Type == 'E' || f.Type == 'f' || f.Type == 'F' || f.Type == 'g' || f.Type == 'G' || f.Type == '%' || f.Precision > 0
 }
 
 func (f FormatSpec) ExpectIntType() bool {
@@ -259,6 +259,9 @@ func (f FormatSpec) Validate() error {
 	}
 	if expectString && f.GroupingOption != 0 {
 		return fmt.Errorf("%w: '=' grouping only allowed with float and int types", ErrValue)
+	}
+	if expectString && f.Precision > 0 {
+		return fmt.Errorf("%w: Precision not allowed with string format specifier 's'", ErrValue)
 	}
 
 	if f.GroupingOption != 0 && (f.Type != 'd' && f.Type != 'b' && f.Type != 'o' && f.Type != 'x' && f.Type != 'X') {
@@ -450,20 +453,14 @@ func (f FormatSpec) FormatValue(v any) (string, ValueCategory, error) {
 		//if f.Fill == ' ' {
 		//	return "", ValueCategoryString, fmt.Errorf("%w: Space not allowed in string format specifier", ErrValue)
 		//}
-		if f.Sign != 0 {
+		if f.Sign != 0 && !f.dialect.tryTypeJugglingString {
 			return "", ValueCategoryString, fmt.Errorf("%w: Sign not allowed in string format specifier", ErrValue)
 		}
-		if f.Alternate {
+		if f.Alternate && !f.dialect.tryTypeJugglingString {
 			return "", ValueCategoryString, fmt.Errorf("%w: Alternate form (#) not allowed in string format specifier", ErrValue)
 		}
-		if f.GroupingOption != 0 {
+		if f.GroupingOption != 0 && !f.dialect.tryTypeJugglingString {
 			return "", ValueCategoryString, fmt.Errorf("%w: Cannot specify '%s' with 's'", ErrValue, string(f.GroupingOption))
-		}
-
-		// Truncation needed?
-		l := len(tv)
-		if f.Precision > 0 && uint(l) > f.Precision {
-			tv = tv[:f.Precision]
 		}
 
 		// We expect this library to be used where type safety isn't guaranteed; Therefore
@@ -471,6 +468,11 @@ func (f FormatSpec) FormatValue(v any) (string, ValueCategory, error) {
 		// before failing.
 		switch f.Type {
 		case 0, 's':
+			// Truncation needed?
+			l := len(tv)
+			if f.Precision > 0 && uint(l) > f.Precision {
+				tv = tv[:f.Precision]
+			}
 			return tv, ValueCategoryString, nil
 
 		case 'e', 'E', 'f', 'F', 'g', 'G', '%':
